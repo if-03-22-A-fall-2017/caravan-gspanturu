@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include "general.h"
 #include "pack_animal.h"
+#include <stdio.h>
 
 #define CAMEL_MAX_SPEED 20
 #define HORSE_MAX_SPEED 50
@@ -24,7 +25,6 @@ struct PackAnimalImplementation {
 	int load;
 	Caravan caravan;
 };
-
 
 static PackAnimal new_pack_animal(const char *name);
 PackAnimal new_camel(const char *name, int max_speed)
