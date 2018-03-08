@@ -112,9 +112,12 @@ void remove_pack_animal(Caravan caravan, PackAnimal animal)
 
   while (current->next->next != NULL) {
     if (current->next->animal == animal) {
+      int load= get_load(current->next->animal);
+      remove_from_caravan(current->next->animal, caravan);
       delete_animal(current->next->animal);
       current->next = current->next->next;
       caravan->length--;
+      caravan->load -= load;
       return;
     }
     current = current->next;
