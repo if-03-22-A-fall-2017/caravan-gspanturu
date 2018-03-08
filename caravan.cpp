@@ -46,64 +46,38 @@ int get_length(Caravan caravan)
 
 void delete_caravan(Caravan caravan)
 {
-/*  if(caravan->length == 0)
-  {
-    sfree(caravan);
-  }
-  else{
     struct Node* current = caravan->head;
-    struct Node* next_node;
 
-    while (current != NULL) {
-          next_node = current->next;
-          sfree(current);
-          current = next_node;
+    while (current != 0) {
+            struct Node* next_node = current;
+          current = current->next;
+          sfree(next_node);
     }
-  }*/
    sfree(caravan);
 }
 
 void add_pack_animal(Caravan caravan, PackAnimal animal)
 {
-  if (caravan->head->animal == NULL) {
-
-    if (animal != 0) {
-
-      if (get_caravan(animal) != NULL) {
-        remove_from_caravan(animal, get_caravan(animal));
-      }
-
-      add_to_caravan(animal, caravan);
-      caravan->head->animal = animal;
-      caravan->head->next = (struct Node*) malloc(sizeof(struct Node));
-      caravan->length++;
-      caravan->load += get_load(animal);
-    }
+  if(animal == 0)
+  {
+    return;
   }
-    else{
-      struct Node* node_to_add = (struct Node*) malloc(sizeof(struct Node));
-      node_to_add->animal = animal;
-      node_to_add->next = NULL;
-
-      struct Node* current = caravan->head;
-
-        while (current->next != NULL ) {
-          current = current->next;
-        }
-
-        if (current != NULL) {
-
-          if (get_caravan(animal) != NULL) {
-            remove_from_caravan(animal, get_caravan(animal));
-          }
-
-          add_to_caravan(animal,caravan);
-          current->next = (struct Node*) malloc(sizeof(struct Node));
-          current->next = node_to_add;
-          caravan->load += get_load(animal);
-          caravan->length++;
-        }
-      }
+  struct Node* node_to_add = (struct Node*) malloc(sizeof(struct Node));
+  node_to_add->animal = animal;
+  node_to_add->next = 0;
+  if (caravan->head == 0) {
+    caravan->head = node_to_add;
+  }
+  else{
+    struct Node* current = caravan->head;
+    while (current->next != NULL) {
+      current = current->next;
+    }
+    current->next = node_to_add;
+    add_to_caravan(animal, caravan);
+    caravan->length++;
+    caravan->load += get_load(animal);
+  }
 }
 
 void remove_pack_animal(Caravan caravan, PackAnimal animal)
