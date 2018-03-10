@@ -23,6 +23,7 @@ struct Node{
 
  struct CaravanImplementation{
 	 struct Node* head;
+   struct Node* tail;
 	 int length;
    int load;
    int speed;
@@ -36,6 +37,7 @@ Caravan new_caravan()
   list->load = 0;
   list->speed = 0;
   list->head = 0;
+  list->tail = 0;
 //  list->head = (struct Node*) malloc(sizeof(struct Node));
   return list;
 }
@@ -68,47 +70,49 @@ void add_pack_animal(Caravan caravan, PackAnimal animal)
     node_to_add->animal = animal;
     node_to_add->next = 0;
 
+    if (get_caravan(animal) != 0) {
+      remove_from_caravan(animal, get_caravan(animal));
+    }
+
     if (caravan->head == 0) {
       caravan->head = node_to_add;
-      add_to_caravan(animal, caravan);
+      caravan->tail = node_to_add;
     }
     else{
-      struct Node* current = caravan->head;
-
-      while (current->next != NULL) {
-        current = current->next;
-      }
-      current->next = node_to_add;
-      add_to_caravan(animal, caravan);
+      caravan->tail->next = node_to_add;
+      caravan->tail = node_to_add;
     }
         caravan->length++;
         caravan->load += get_load(animal);
+        add_to_caravan(animal, caravan);
   }
 }
 
 void remove_pack_animal(Caravan caravan, PackAnimal animal)
 {
-  if (animal == 0 || caravan == 0) {
+  if (animal == 0 || caravan == 0 || caravan->head == 0) {
     return;
   }
   struct Node* current = caravan->head;
-
+  struct Node* node_to_free = current;
 
   if (current->animal == animal) {
     int load = get_load(current->animal);
     remove_from_caravan(current->animal, caravan);
     current = current->next;
+    sfree(node_to_free);
     caravan->length--;
     caravan->load -= load;
     return;
   }
-  while (current->next->next != NULL) {
+  while (current->next != NULL) {
+    node_to_free = current->next;
     if (current->next->animal == animal) {
-
       int load= get_load(current->next->animal);
       remove_from_caravan(current->next->animal, caravan);
-      delete_animal(current->next->animal);
       current->next = current->next->next;
+  //    delete_animal(current->next->animal);
+      sfree(node_to_free);
       caravan->length--;
       caravan->load -= load;
       return;
@@ -125,27 +129,26 @@ int get_caravan_load(Caravan caravan)
 void unload(Caravan caravan)
 {
   struct Node* current = caravan->head;
-   while (current->next != NULL) {
-    unload(current->animal);
-    current = current->next;
-  }
+   for (int i = 0; i < caravan->length; i++) {
+     unload(current->animal);
+     current=current->next;
+      }
 }
 
 int get_caravan_speed(Caravan caravan)
 {
-  /*if (caravan->head != NULL) {
+  if (caravan->head != NULL) {
     PackAnimal slowest_animal = caravan->head->animal;
     struct Node* current = caravan->head;
-
-
-  while (current->next != NULL) {
-    if (current->animal->get_actual_speed(current->animal) >= current->next->animal->get_actual_speed(current->next->animal)) {
-      slowest_animal = current->next->animal;
+    current = current->next;
+  for (int i = 1; i < caravan->length; i++) {
+    if (get_actual_speed(slowest_animal) >= get_actual_speed(current->animal)) {
+      slowest_animal = current->animal;
     }
     current = current->next;
   }
-  return slowest_animal->get_actual_speed(slowest_animal);
-}*/
+  return get_actual_speed(slowest_animal);
+}
   return 0;
 }
 
